@@ -1,0 +1,30 @@
+{
+    "name": "fahmiardi/laravel-mongodb-user-provider",
+    "description": "User Providers handling for Laravel 5.3 using Mongodb (Moloquent)",
+    "keywords": [
+        "socialite",
+        "user",
+        "provider",
+        "laravel",
+        "mongodb",
+        "moloquent"
+    ],
+    "homepage": "https://github.com/fahmiardi/laravel-mongodb-user-provider",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fahmi Ardi",
+            "email": "f4hem.net@gmail.com",
+            "homepage": "https://github.com/fahmiardi",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "moloquent/moloquent": "^0.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fahmiardi\\Mongodb\\UserProviders\\": "src/"
+        }
+    }
+}
