@@ -5,9 +5,9 @@ namespace Fahmiardi\Mongodb\UserProviders;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Fahmiardi\Mongodb\UserProviders\Contracts\Provider as ProviderContract;
-use Fahmiardi\Mongodb\UserProviders\Contracts\EmbedProvider as EmbedProviderContract;
+use Fahmiardi\Mongodb\UserProviders\Contracts\UserProvider as UserProviderContract;
 use Fahmiardi\Mongodb\UserProviders\Models\Provider;
-use Fahmiardi\Mongodb\UserProviders\Models\EmbedProvider;
+use Fahmiardi\Mongodb\UserProviders\Models\UserProvider;
 
 class UserProviderServiceProvider extends ServiceProvider
 {
@@ -25,17 +25,17 @@ class UserProviderServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerEmbedModelBindings();
+        $this->registerModelBindings();
         $this->registerBladeExtensions();
     }
 
     /**
      * Bind the Provider model into the IoC.
      */
-    protected function registerEmbedModelBindings()
+    protected function registerModelBindings()
     {
         $this->app->bind(ProviderContract::class, Provider::class);
-        $this->app->bind(EmbedProviderContract::class, EmbedProvider::class);
+        $this->app->bind(UserProviderContract::class, UserProvider::class);
     }
 
     /**

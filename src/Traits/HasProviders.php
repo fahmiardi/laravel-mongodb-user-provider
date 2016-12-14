@@ -3,33 +3,37 @@
 namespace Fahmiardi\Mongodb\UserProviders\Traits;
 
 use Fahmiardi\Mongodb\UserProviders\Contracts\Provider;
-use Fahmiardi\Mongodb\UserProviders\Contracts\EmbedProvider;
-use Carbon\Carbon;
+use Fahmiardi\Mongodb\UserProviders\Contracts\UserProvider;
+use Fahmiardi\Mongodb\UserProviders\Exceptions\ProviderOwnedByOther;
 
 trait HasProviders
 {
     public function providers()
     {
-        return $this->embedsMany(app(EmbedProvider::class));
+        return $this->hasMany(app(UserProvider::class), 'user_id');
     }
 
     public function addProvider($provider, $uniqueId, $meta = [])
     {
         $provider = $this->getStoredProvider($provider);
+        $existProvider = app(UserProvider::class)->where([
+            'provider_id' => $provider->_id,
+            'provider_unique' => $uniqueId
+        ])->first();
 
-        if (! $this->providers()->where([
-            'id' => $provider->_id,
-            'unique' => $uniqueId
-        ])->first()) {
-            $this->providers()->associate(app(EmbedProvider::class)->forceFill([
-                'id' => $provider->_id,
-                'unique' => $uniqueId,
-                'meta' => $meta,
-                'created_at' => $now = Carbon::now(),
-                'updated_at' => $now
+        if (
+            $existProvider &&
+            $existProvider->user_id !== $this->getAttribute($this->primaryKey)
+        ) {
+            throw new ProviderOwnedByOther();
+        }
+
+        if (! $existProvider) {
+            $this->providers()->save(app(UserProvider::class)->forceFill([
+                'provider_id' => $provider->_id,
+                'provider_unique' => $uniqueId,
+                'meta' => $meta
             ]));
-
-            $this->save();
         }
 
         return $this;
@@ -39,15 +43,14 @@ trait HasProviders
     {
         $provider = $this->getStoredProvider($provider);
 
-        return $this->providers()->where('id', $provider->_id)->first();
+        return $this->providers()->where('provider_id', $provider->_id)->first();
     }
 
     public function removeProvider($provider)
     {
         $provider = $this->getStoredProvider($provider);
-        $embedProvider = $this->providers()->where('id', $provider->_id);
 
-        $this->providers()->detach($embedProvider);
+        $this->providers()->where('provider_id', $provider->_id)->delete();
 
         return $this;
     }
@@ -57,11 +60,11 @@ trait HasProviders
         if (is_string($providers)) {
             $providers = $this->getStoredProvider($providers);
 
-            return $this->providers->contains('id', $providers->_id);
+            return $this->providers->contains('provider_id', $providers->_id);
         }
 
         if ($providers instanceof Provider) {
-            return $this->providers->contains('id', $providers->_id);
+            return $this->providers->contains('provider_id', $providers->_id);
         }
 
         if (is_array($providers)) {

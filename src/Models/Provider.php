@@ -10,9 +10,7 @@ class Provider extends Model implements ProviderContract
 {
     public function users()
     {
-        return $this->getProviders(
-            config('auth.model') ?: config('auth.providers.users.model')
-        );
+        return $this->hasMany(app(UserProvider::class), 'provider_id');
     }
 
     public static function findByName($name)
@@ -24,10 +22,5 @@ class Provider extends Model implements ProviderContract
         }
 
         return $provider;
-    }
-
-    protected function getProviders($model)
-    {
-        return (new $model)->where('providers.id', $this->getAttribute($this->primaryKey));
     }
 }
