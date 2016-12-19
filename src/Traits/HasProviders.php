@@ -60,11 +60,11 @@ trait HasProviders
         if (is_string($providers)) {
             $providers = $this->getStoredProvider($providers);
 
-            return $this->providers->contains('provider_id', $providers->_id);
+            return $this->providers()->where('provider_id', $providers->_id)->exists();
         }
 
         if ($providers instanceof Provider) {
-            return $this->providers->contains('provider_id', $providers->_id);
+            return $this->providers()->where('provider_id', $providers->_id)->exists();
         }
 
         if (is_array($providers)) {
